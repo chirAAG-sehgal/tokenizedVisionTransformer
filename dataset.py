@@ -11,6 +11,7 @@ from torchvision import transforms, utils
 import os
 import numpy as np
 import cv2
+from collections import deque
 
 class DARPA_Dataset(Dataset):
     def __init__(self, root_dir, transform=None):
@@ -55,35 +56,33 @@ def get_dataloader(root_dir, batch_size):
     return dataloader
 
 
+ 
 
-def flood_fill(image):
-    coloumns, rows = image.shape
-    tl_x, tl_y = 0, 0 
-    bl_x, bl_y = 0, coloumns
-    tr_x, tr_y = rows, 0
-    tr_x, tr_y = rows, coloumns
-    def is_valid(nx, ny):
-        if (nx<rows) and (ny<coloumns):
-            return True
-        else:
-            return False
-    
-    def infection(nx, ny):
-        if not is_valid(nx, ny):
-            pass
-        else:
-            if (list(image[ny, nx]) != [0,0,0]):
-                return nx, ny
-            else:
-                infection(nx+1, ny+1)
-                infection(nx-1, ny)
-                infection(nx+1, ny)
-                infection(nx, ny-1)
-                infection(nx, ny+1)
-    infection(tl_x, tl_y)
-    image = cv2.drawCircle(image, (tl_x, tl_y), 1, (0,0,0), -1)
-    cv2.imshow('image', image)
 
-def main():
-    flood_fill(cv2.imread(''))
+def bfs(image, startrow,startcol, visited):
+    # Create a queue for BFS
+    q = deque()
+    row,col = image.shape
+
+    # Mark the current node as visited and enqueue it
+    visited[startrow][startcol] = True
+    q.append([startrow,startcol])
+
+    # Iterate over the queue
+    while q:
+        # Dequeue a vertex from queue and print it
+        currentnode = q.popleft()
+        currentrow,currentcol = currentnode
+        color = image[currentrow][currentcol]
+        if color!=0:
+            return (currentnode)
+
+        # Get all adjacent vertices of the dequeued vertex
+        # If an adjacent has not been visited, then mark it visited and enqueue it
+        for i in range(-1,2):
+            for j in range(-1,2):
+                if not visited[currentrow-i][currentcol-j] and currentrow-i>=0 and currentrow-i<row and currentcol-j>=0 and currentcol-j<col:
+                    visited[currentrow-i][currentcol-j] = True
+                    q.append([currentrow-i,currentcol-j])
+
 
