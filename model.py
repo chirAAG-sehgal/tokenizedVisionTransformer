@@ -658,7 +658,7 @@ class VectorQuantizer(nn.Module):
             torch.einsum('bd,dn->bn', z_flattened, torch.einsum('n d -> d n', embedding))
 
         min_encoding_indices = torch.argmin(d, dim=1)
-        z_q = embedding[min_encoding_indices]
+        z_q = embedding[min_encoding_indices].view(z.shape)
         # perplexity = None
         # min_encodings = None
         # vq_loss = None
@@ -679,10 +679,10 @@ class VectorQuantizer(nn.Module):
         #     entropy_loss = self.entropy_loss_ratio * compute_entropy_loss(-d)
 
         # preserve gradients
-        # z_q = z + (z_q - z).detach()
+        # z_q = z + (z_q - z).detach() 
 
         # reshape back to match original input shape
-        # z_q = torch.einsum('b h w c -> b c h w', z_q)
+        z_q = torch.einsum('b h w c -> b c h w', z_q)
 
         # return z_q, (vq_loss, commit_loss, entropy_loss, codebook_usage), (perplexity, min_encodings, min_encoding_indices)
         return z_q
@@ -714,7 +714,7 @@ class tokenizerConfig:
     entropy_loss_ratio: float = 0.0
     z_channels: int = 256
     dropout_p: float = 0.0
-    encoder_ch_mult: List[int] = field(default_factory=lambda: [1, 1, 2, 2, 4])
+    encoder_ch_mult: List[int] = field(default_factory=lambda: [1, 2, 2, 4])
 
 
 class tokenizer(nn.Module):
