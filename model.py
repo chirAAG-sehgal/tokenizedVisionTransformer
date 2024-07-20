@@ -659,29 +659,6 @@ class VectorQuantizer(nn.Module):
 
         min_encoding_indices = torch.argmin(d, dim=1)
         z_q = embedding[min_encoding_indices].view(z.shape)
-        # perplexity = None
-        # min_encodings = None
-        # vq_loss = None
-        # commit_loss = None
-        # entropy_loss = None
-        # codebook_usage = 0
-
-        # if self.show_usage and self.training:
-        #     cur_len = min_encoding_indices.shape[0]
-        #     self.codebook_used[:-cur_len] = self.codebook_used[cur_len:].clone()
-        #     self.codebook_used[-cur_len:] = min_encoding_indices
-        #     codebook_usage = len(torch.unique(self.codebook_used)) / self.n_e
-
-        # compute loss for embedding
-        # if self.training:
-        #     vq_loss = torch.mean((z_q - z.detach()) ** 2) 
-        #     commit_loss = self.beta * torch.mean((z_q.detach() - z) ** 2) 
-        #     entropy_loss = self.entropy_loss_ratio * compute_entropy_loss(-d)
-
-        # preserve gradients
-        # z_q = z + (z_q - z).detach() 
-
-        # reshape back to match original input shape
         z_q = torch.einsum('b h w c -> b c h w', z_q)
 
         # return z_q, (vq_loss, commit_loss, entropy_loss, codebook_usage), (perplexity, min_encodings, min_encoding_indices)
@@ -736,10 +713,6 @@ class tokenizer(nn.Module):
     def forward(self, input):
         quant = self.encode(input)
         return quant
-
-        
-
-    
 
 
 def main():
