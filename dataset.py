@@ -18,7 +18,11 @@ class DARPA_Dataset(Dataset):
     def __init__(self, root_dir, transform=None):
         self.root_dir = root_dir
         self.transform = transform
+<<<<<<< HEAD
         randomly_sample_normal = random.sample(os.listdir('final_daataa/normal'), len(os.listdir('final_daataa/trauma')))
+=======
+        randomly_sample_normal = random.sample(os.listdir(f'{root_dir}/normal'), len(os.listdir(f'{root_dir}/trauma')))
+>>>>>>> origin/master_2
         self.images = os.listdir('final_daataa/trauma') + randomly_sample_normal
         self.labels = [1]*len(os.listdir('final_daataa/trauma')) + [0]*len(os.listdir('final_daataa/trauma'))
         
@@ -30,16 +34,30 @@ class DARPA_Dataset(Dataset):
             idx = idx.tolist()
         
         label = self.labels[idx]
+<<<<<<< HEAD
+=======
+        
+>>>>>>> origin/master_2
         if label == 1:
             img_name = os.path.join('final_daataa/trauma', self.images[idx])
         else:
             img_name = os.path.join('final_daataa/normal', self.images[idx])
+<<<<<<< HEAD
         image = Image.open(img_name)
 
         if self.transform:
             image = self.transform(image)
         
         return image, label
+=======
+        
+        image = Image.open(img_name).convert("RGB")
+
+        if self.transform:
+            image = self.transform(image)
+        label_tensor = torch.tensor(label, dtype=torch.long).to(torch.device('cuda'))
+        return image, label_tensor
+>>>>>>> origin/master_2
     
     
 # class MajorCrop_Rescale: #cropping major poart of the gaussian image and rescaking the object to 256x256
@@ -48,17 +66,36 @@ class DARPA_Dataset(Dataset):
 #     def __call__(self, sample):
 #         image, label = sample[image], self[label]
 
+<<<<<<< HEAD
+=======
+class Transforms_Llama:
+    def __call__(self,image):
+        image = np.array(image) / 255
+        image = 2.0 * image - 1.0
+        image_tensor = torch.tensor(image)
+        image_tensor = torch.einsum('hwc->chw',image_tensor)
+        image_input = image_tensor.float().to("cuda")
+        del image,image_tensor
+        return image_input
+>>>>>>> origin/master_2
 
     
 def get_dataloader(root_dir, batch_size):
     transform = transforms.Compose([
         transforms.Resize((256, 256)),
+<<<<<<< HEAD
         transforms.ToTensor()
     ])
     
     dataset = DARPA_Dataset(root_dir, transform)
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
     
+=======
+        Transforms_Llama(),
+    ])
+    dataset = DARPA_Dataset(root_dir, transform)
+    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+>>>>>>> origin/master_2
     return dataloader
 
 

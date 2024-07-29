@@ -4,6 +4,7 @@ from torchsummary import summary
 import torch.nn.functional as F
 from dataclasses import dataclass, field
 from typing import List
+<<<<<<< HEAD
 
 class PatchEmbed(nn.Module):
     """Split image into patches and then embed them.
@@ -427,6 +428,10 @@ class VisionTransformer(nn.Module):
         x = self.head(cls_token_final)
 
         return x
+=======
+import numpy as np
+
+>>>>>>> origin/master_2
     
 class ResnetBlock(nn.Module):
     def __init__(self, in_channels, out_channels=None, conv_shortcut=False, dropout=0.0, norm_type='group'):
@@ -658,9 +663,23 @@ class VectorQuantizer(nn.Module):
             torch.einsum('bd,dn->bn', z_flattened, torch.einsum('n d -> d n', embedding))
 
         min_encoding_indices = torch.argmin(d, dim=1)
+<<<<<<< HEAD
         z_q = embedding[min_encoding_indices].view(z.shape)
         z_q = torch.einsum('b h w c -> b c h w', z_q)
 
+=======
+
+        min_encoding_indices = min_encoding_indices.cpu().detach().numpy()
+        for i,index in enumerate(min_encoding_indices):
+            index_new = np.random.normal(loc=index,scale=1) 
+            if index_new > 16383.0:
+                index_new = 16383.0
+            min_encoding_indices[i] = int(index_new)
+        min_encoding_indices = torch.tensor(min_encoding_indices,dtype=torch.int64).to('cuda')
+
+        z_q = embedding[min_encoding_indices].view(z.shape)
+        z_q = torch.reshape(z_q,(z_q.shape[0],-1,self.e_dim))        
+>>>>>>> origin/master_2
         # return z_q, (vq_loss, commit_loss, entropy_loss, codebook_usage), (perplexity, min_encodings, min_encoding_indices)
         return z_q
 
