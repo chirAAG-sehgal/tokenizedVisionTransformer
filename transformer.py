@@ -348,13 +348,13 @@ class VisionTransformer(nn.Module):
     """
     def __init__(
             self,
-            img_size=384,
-            patch_size=32,
+            img_size=256,
+            patch_size=8,
             in_chans=3,
             n_classes=2,
             embed_dim=8,
-            depth=2,
-            n_heads=12,
+            depth=12,
+            n_heads=4,
             mlp_ratio=4.,
             qkv_bias=True,
             p=0.,
@@ -373,7 +373,7 @@ class VisionTransformer(nn.Module):
                 torch.zeros(1, 1 + self.patch_embed.n_patches, embed_dim)
         )
         self.pos_drop = nn.Dropout(p=p)
-
+        
         self.blocks = nn.ModuleList(
             [
                 Block(
@@ -406,7 +406,6 @@ class VisionTransformer(nn.Module):
             Logits over all the classes - `(n_samples, n_classes)`.
         """
         n_samples = x.shape[0]
-        x = self.patch_embed(x)
 
         cls_token = self.cls_token.expand(
                 n_samples, -1, -1
